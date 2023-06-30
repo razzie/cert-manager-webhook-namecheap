@@ -1,10 +1,10 @@
 OS ?= $(shell go env GOOS)
 ARCH ?= $(shell go env GOARCH)
 
-IMAGE_NAME := cert-manager-webhook-namecheap
-IMAGE_TAG := $(shell git describe --dirty)
-REPO_NAME := kelvie
-PLATFORMS := linux/amd64,linux/arm64
+IMAGE_NAME ?= cert-manager-webhook-namecheap
+IMAGE_TAG ?= $(shell git describe --dirty)
+REPO_NAME ?= kelvie
+PLATFORMS ?= linux/amd64,linux/arm64
 
 OUT := $(shell pwd)/_out
 
@@ -36,6 +36,8 @@ push:
 	docker buildx build --push --platform $(PLATFORMS) -t "$(REPO_NAME)/$(IMAGE_NAME):latest" .
 	docker buildx build --push --platform $(PLATFORMS) -t "$(REPO_NAME)/$(IMAGE_NAME):$(IMAGE_TAG)" .
 
+build:
+	CGO_ENABLED=0 go build -o webhook -ldflags '-w -extldflags "-static"' .
 
 .PHONY: rendered-manifest.yaml
 rendered-manifest.yaml:
